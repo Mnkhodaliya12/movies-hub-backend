@@ -1,0 +1,10 @@
+com\example\movieshub\entity\Category$CategoryBuilder.class
+com\example\movieshub\entity\Category.class
+com\example\movieshub\controller\MovieController.class
+com\example\movieshub\entity\Movie$MovieBuilder.class
+com\example\movieshub\repository\MovieRepository.class
+com\example\movieshub\entity\Movie$Status.class
+com\example\movieshub\entity\Movie.class
+com\example\movieshub\repository\CategoryRepository.class
+com\example\movieshub\controller\CategoryController.class
+com\example\movieshub\MoviesHubApplication.class

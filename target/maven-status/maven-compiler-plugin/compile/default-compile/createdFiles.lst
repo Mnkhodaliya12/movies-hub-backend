@@ -1,6 +1,7 @@
 com\example\movieshub\entity\Category$CategoryBuilder.class
 com\example\movieshub\entity\Category.class
 com\example\movieshub\controller\MovieController.class
+com\example\movieshub\dto\MovieCreateRequestDto$MovieCreateRequestDtoBuilder.class
 com\example\movieshub\repository\CategoryRepository.class
 com\example\movieshub\controller\CategoryController.class
 com\example\movieshub\MoviesHubApplication.class
@@ -16,6 +17,7 @@ com\example\movieshub\controller\AdminMovieController.class
 com\example\movieshub\entity\Movie$Status.class
 com\example\movieshub\entity\Movie.class
 com\example\movieshub\config\WebConfig.class
+com\example\movieshub\dto\MovieCreateRequestDto.class
 com\example\movieshub\config\WebConfig$1.class
 com\example\movieshub\dto\ResponseModel.class
 com\example\movieshub\service\MovieService.class

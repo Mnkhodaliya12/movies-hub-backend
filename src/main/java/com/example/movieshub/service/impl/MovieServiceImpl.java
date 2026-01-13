@@ -37,6 +37,12 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    public ResponseModel search(String query) {
+        List<Movie> movies = movieRepository.searchMovies(query);
+        return CommonUtil.createResponse(HttpStatus.OK, "Movies searched successfully", movies);
+    }
+
+    @Override
     public ResponseModel create(MovieCreateRequestDto movieDto) {
 
         if (movieRepository.existsByTitleIgnoreCase(movieDto.getTitle())) {

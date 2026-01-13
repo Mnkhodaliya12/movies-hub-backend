@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.movieshub.dto.ResponseModel;
@@ -35,5 +36,10 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
- 
+    @GetMapping("/movies/search")
+    public ResponseEntity<ResponseModel> searchMovies(@RequestParam("query") String query) {
+        ResponseModel response = movieService.search(query);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

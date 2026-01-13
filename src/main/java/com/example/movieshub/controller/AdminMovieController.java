@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
+import com.example.movieshub.dto.MovieCreateRequestDto;
 import com.example.movieshub.dto.ResponseModel;
-import com.example.movieshub.entity.Movie;
 import com.example.movieshub.service.MovieService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,14 +43,15 @@ public class AdminMovieController {
 	    }
 
 	    @PostMapping("/movies")
-	    public ResponseEntity<ResponseModel> createMovie(@RequestBody Movie movie) {
-	        ResponseModel response = movieService.create(movie);
+	    public ResponseEntity<ResponseModel> createMovie(@Valid @RequestBody MovieCreateRequestDto movieDto) {
+	        ResponseModel response = movieService.create(movieDto);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
 
 	    @PutMapping("/movies/{id}")
-	    public ResponseEntity<ResponseModel> updateMovie(@PathVariable Long id, @RequestBody Movie updated) {
-	        ResponseModel response = movieService.update(id, updated);
+	    public ResponseEntity<ResponseModel> updateMovie(@PathVariable Long id,
+	                                                   @Valid @RequestBody MovieCreateRequestDto updatedDto) {
+	        ResponseModel response = movieService.update(id, updatedDto);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
 

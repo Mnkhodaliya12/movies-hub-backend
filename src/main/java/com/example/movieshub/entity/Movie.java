@@ -39,13 +39,15 @@ public class Movie {
     private Status status;
 
     private String posterPath;
+    
+    private String videoUrl;
 
     @ManyToMany
-//    @JoinTable(
-//            name = "movie_categories",
-//            joinColumns = @JoinColumn(name = "movie_id"),
-//            inverseJoinColumns = @JoinColumn(name = "category_id")
-//    )
+    @JoinTable(
+            name = "movie_categories",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     private Set<Category> categories = new HashSet<>();
 
     @CreationTimestamp

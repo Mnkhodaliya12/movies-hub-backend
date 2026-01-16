@@ -11,7 +11,13 @@ import com.example.movieshub.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,8 +48,31 @@ public class MovieServiceImpl implements MovieService {
         return CommonUtil.createResponse(HttpStatus.OK, "Movies searched successfully", movies);
     }
 
+    private static final String POSTER_UPLOAD_DIR = "uploads/posters";
+
+    private String storePosterFile(MultipartFile posterFile) {
+        if (posterFile == null || posterFile.isEmpty()) {
+            return null;
+        }
+
+        try {
+            Path uploadPath = Paths.get(POSTER_UPLOAD_DIR).toAbsolutePath().normalize();
+            Files.createDirectories(uploadPath);
+
+            String originalFilename = posterFile.getOriginalFilename();
+            String fileName = System.currentTimeMillis() + "_" + (originalFilename != null ? originalFilename : "poster");
+
+            Path targetLocation = uploadPath.resolve(fileName);
+            Files.copy(posterFile.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            return "/" + POSTER_UPLOAD_DIR + "/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Could not store poster file", e);
+        }
+    }
+
     @Override
-    public ResponseModel create(MovieCreateRequestDto movieDto) {
+    public ResponseModel create(MovieCreateRequestDto movieDto, MultipartFile posterFile) {
 
         if (movieRepository.existsByTitleIgnoreCase(movieDto.getTitle())) {
             return CommonUtil.createResponse(
@@ -57,6 +86,11 @@ public class MovieServiceImpl implements MovieService {
             categories.addAll(categoryRepository.findAllById(movieDto.getCategoryIds()));
         }
 
+        String storedPosterPath = storePosterFile(posterFile);
+        if (storedPosterPath != null) {
+            movieDto.setPosterPath(storedPosterPath);
+        }
+
         Movie movie = movieDto.toMovie(categories);
 
         Movie saved = movieRepository.save(movie);
@@ -64,13 +98,19 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public ResponseModel update(Long id, MovieCreateRequestDto updatedDto) {
+    public ResponseModel update(Long id, MovieCreateRequestDto updatedDto, MultipartFile posterFile) {
         Movie existing = movieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         Set<Category> categories = new HashSet<>();
         if (updatedDto.getCategoryIds() != null && !updatedDto.getCategoryIds().isEmpty()) {
             categories.addAll(categoryRepository.findAllById(updatedDto.getCategoryIds()));
+        }
+        String storedPosterPath = storePosterFile(posterFile);
+        if (storedPosterPath != null) {
+            updatedDto.setPosterPath(storedPosterPath);
+        } else {
+            updatedDto.setPosterPath(existing.getPosterPath());
         }
 
         updatedDto.updateEntity(existing, categories);

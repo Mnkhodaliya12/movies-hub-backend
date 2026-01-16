@@ -1,6 +1,7 @@
 package com.example.movieshub.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -8,9 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 import com.example.movieshub.dto.MovieCreateRequestDto;
@@ -42,16 +44,19 @@ public class AdminMovieController {
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
 
-	    @PostMapping("/movies")
-	    public ResponseEntity<ResponseModel> createMovie(@Valid @RequestBody MovieCreateRequestDto movieDto) {
-	        ResponseModel response = movieService.create(movieDto);
+	    @PostMapping(value = "/movies", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	    public ResponseEntity<ResponseModel> createMovie(
+	            @Valid @RequestPart("movie") MovieCreateRequestDto movieDto,
+	            @RequestPart(value = "poster", required = false) MultipartFile posterFile) {
+	        ResponseModel response = movieService.create(movieDto, posterFile);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
 
-	    @PutMapping("/movies/{id}")
+	    @PutMapping(value = "/movies/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	    public ResponseEntity<ResponseModel> updateMovie(@PathVariable Long id,
-	                                                   @Valid @RequestBody MovieCreateRequestDto updatedDto) {
-	        ResponseModel response = movieService.update(id, updatedDto);
+	                                                   @Valid @RequestPart("movie") MovieCreateRequestDto updatedDto,
+	                                                   @RequestPart(value = "poster", required = false) MultipartFile posterFile) {
+	        ResponseModel response = movieService.update(id, updatedDto, posterFile);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
 

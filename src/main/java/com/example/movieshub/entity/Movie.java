@@ -42,6 +42,14 @@ public class Movie {
     
     private String videoUrl;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "movie_screenshots",
+            joinColumns = @JoinColumn(name = "movie_id")
+    )
+    @Column(name = "screenshot_path")
+    private Set<String> screenshots = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "movie_categories",

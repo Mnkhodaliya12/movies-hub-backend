@@ -17,4 +17,6 @@ public interface MovieService {
     ResponseModel update(Long id, MovieCreateRequestDto movieDto, MultipartFile posterFile);
 
     ResponseModel delete(Long id);
+
+    ResponseModel addScreenshots(Long id, MultipartFile[] screenshots);
 }

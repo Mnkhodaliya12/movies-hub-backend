@@ -65,4 +65,12 @@ public class AdminMovieController {
 	        ResponseModel response = movieService.delete(id);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
+
+    @PostMapping(value = "/movies/{id}/screenshots", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseModel> addScreenshots(
+            @PathVariable Long id,
+            @RequestPart("screenshots") MultipartFile[] screenshots) {
+        ResponseModel response = movieService.addScreenshots(id, screenshots);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

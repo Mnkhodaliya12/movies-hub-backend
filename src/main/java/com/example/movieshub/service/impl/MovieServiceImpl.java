@@ -49,6 +49,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     private static final String POSTER_UPLOAD_DIR = "uploads/posters";
+    private static final String SCREENSHOT_UPLOAD_DIR = "uploads/screenshots";
 
     private String storePosterFile(MultipartFile posterFile) {
         if (posterFile == null || posterFile.isEmpty()) {
@@ -68,6 +69,27 @@ public class MovieServiceImpl implements MovieService {
             return "/" + POSTER_UPLOAD_DIR + "/" + fileName;
         } catch (IOException e) {
             throw new RuntimeException("Could not store poster file", e);
+        }
+    }
+
+    private String storeScreenshotFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        try {
+            Path uploadPath = Paths.get(SCREENSHOT_UPLOAD_DIR).toAbsolutePath().normalize();
+            Files.createDirectories(uploadPath);
+
+            String originalFilename = file.getOriginalFilename();
+            String fileName = System.currentTimeMillis() + "_" + (originalFilename != null ? originalFilename : "screenshot");
+
+            Path targetLocation = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            return "/" + SCREENSHOT_UPLOAD_DIR + "/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Could not store screenshot file", e);
         }
     }
 
@@ -123,5 +145,27 @@ public class MovieServiceImpl implements MovieService {
     public ResponseModel delete(Long id) {
         movieRepository.deleteById(id);
         return CommonUtil.createResponse(HttpStatus.NO_CONTENT, "Movie deleted successfully");
+    }
+
+    @Override
+    public ResponseModel addScreenshots(Long id, MultipartFile[] screenshots) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        if (screenshots != null) {
+            if (movie.getScreenshots() == null) {
+                movie.setScreenshots(new HashSet<>());
+            }
+
+            for (MultipartFile file : screenshots) {
+                String storedPath = storeScreenshotFile(file);
+                if (storedPath != null) {
+                    movie.getScreenshots().add(storedPath);
+                }
+            }
+        }
+
+        Movie saved = movieRepository.save(movie);
+        return CommonUtil.createResponse(HttpStatus.OK, "Screenshots added successfully", saved);
     }
 }

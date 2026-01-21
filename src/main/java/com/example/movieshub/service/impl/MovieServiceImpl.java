@@ -51,6 +51,11 @@ public class MovieServiceImpl implements MovieService {
     private static final String POSTER_UPLOAD_DIR = "uploads/posters";
     private static final String SCREENSHOT_UPLOAD_DIR = "uploads/screenshots";
 
+    // 2 MB per image
+    private static final long MAX_IMAGE_SIZE_BYTES = 2L * 1024 * 1024;
+    // 10 MB total for all screenshots in a single request
+    private static final long MAX_TOTAL_SCREENSHOTS_SIZE_BYTES = 10L * 1024 * 1024;
+
     private String storePosterFile(MultipartFile posterFile) {
         if (posterFile == null || posterFile.isEmpty()) {
             return null;
@@ -108,6 +113,13 @@ public class MovieServiceImpl implements MovieService {
             categories.addAll(categoryRepository.findAllById(movieDto.getCategoryIds()));
         }
 
+        if (posterFile != null && !posterFile.isEmpty() && posterFile.getSize() > MAX_IMAGE_SIZE_BYTES) {
+            return CommonUtil.createResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Poster image is too large. Maximum allowed size is 2MB."
+            );
+        }
+
         String storedPosterPath = storePosterFile(posterFile);
         if (storedPosterPath != null) {
             movieDto.setPosterPath(storedPosterPath);
@@ -128,6 +140,14 @@ public class MovieServiceImpl implements MovieService {
         if (updatedDto.getCategoryIds() != null && !updatedDto.getCategoryIds().isEmpty()) {
             categories.addAll(categoryRepository.findAllById(updatedDto.getCategoryIds()));
         }
+
+        if (posterFile != null && !posterFile.isEmpty() && posterFile.getSize() > MAX_IMAGE_SIZE_BYTES) {
+            return CommonUtil.createResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Poster image is too large. Maximum allowed size is 2MB."
+            );
+        }
+
         String storedPosterPath = storePosterFile(posterFile);
         if (storedPosterPath != null) {
             updatedDto.setPosterPath(storedPosterPath);
@@ -153,6 +173,27 @@ public class MovieServiceImpl implements MovieService {
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         if (screenshots != null) {
+            long totalSize = 0L;
+            for (MultipartFile file : screenshots) {
+                if (file == null || file.isEmpty()) {
+                    continue;
+                }
+                long size = file.getSize();
+                if (size > MAX_IMAGE_SIZE_BYTES) {
+                    return CommonUtil.createResponse(
+                            HttpStatus.BAD_REQUEST,
+                            "One or more screenshots are too large. Maximum allowed size is 2MB per image."
+                    );
+                }
+                totalSize += size;
+                if (totalSize > MAX_TOTAL_SCREENSHOTS_SIZE_BYTES) {
+                    return CommonUtil.createResponse(
+                            HttpStatus.BAD_REQUEST,
+                            "Total screenshots size is too large. Maximum combined size is 10MB."
+                    );
+                }
+            }
+
             if (movie.getScreenshots() == null) {
                 movie.setScreenshots(new HashSet<>());
             }

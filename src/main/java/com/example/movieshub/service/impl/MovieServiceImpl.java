@@ -173,6 +173,13 @@ public class MovieServiceImpl implements MovieService {
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         if (screenshots != null) {
+            if (screenshots.length > 6) {
+                return CommonUtil.createResponse(
+                        HttpStatus.BAD_REQUEST,
+                        "You can upload a maximum of 6 screenshots."
+                );
+            }
+
             long totalSize = 0L;
             for (MultipartFile file : screenshots) {
                 if (file == null || file.isEmpty()) {

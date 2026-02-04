@@ -1,12 +1,14 @@
 package com.example.movieshub.service;
 
 import com.example.movieshub.dto.MovieCreateRequestDto;
+import com.example.movieshub.dto.PageResponseModel;
+import com.example.movieshub.dto.PageableDTO;
 import com.example.movieshub.dto.ResponseModel;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MovieService {
 
-    ResponseModel findAll();
+    PageResponseModel findAll(PageableDTO  pageableDTO);
 
     ResponseModel findById(Long id);
 

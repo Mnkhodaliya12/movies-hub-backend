@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 import com.example.movieshub.dto.MovieCreateRequestDto;
+import com.example.movieshub.dto.PageResponseModel;
+import com.example.movieshub.dto.PageableDTO;
 import com.example.movieshub.dto.ResponseModel;
 import com.example.movieshub.service.MovieService;
 
@@ -33,8 +35,8 @@ public class AdminMovieController {
 	private final MovieService movieService;
 
 	 @GetMapping("/movies")
-	    public ResponseEntity<ResponseModel> getAllMovies() {
-	        ResponseModel response = movieService.findAll();
+	    public ResponseEntity<PageResponseModel> getAllMovies(PageableDTO dto) {
+	         PageResponseModel response = movieService.findAll(dto);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
 
